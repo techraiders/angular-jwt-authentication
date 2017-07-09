@@ -19,7 +19,8 @@
       UserFactory.login(username, password).then(onSuccess, onError);
 
       function onSuccess(response) {
-        vm.user = response.data;
+        vm.user = response.data.user;
+        alert(response.data.token);
       }
 
       function onError(reason) {

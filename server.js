@@ -2,6 +2,8 @@ var express = require('express'),
   faker = require('faker'),
   cors = require('cors'),
   bodyParser = require('body-parser'),
+  jwt = require('jsonwebtoken'),
+  jwtSecret = 'jhskjdf5464mhsdh/6uk',
   app = express(),
 
   // sudo database having registered user details to match
@@ -24,7 +26,13 @@ app.get('/random-user', function(req, res) {
 
 // responds to post request made by cliet when path in url is /login
 app.post('/login', authenticate, function(req, res) {
-  res.send(user);
+  var token = jwt.sign({
+    username: user.username
+  }, jwtSecret);
+  res.send({
+    token: token,
+    user: user
+  });
 });
 
 // UTIL FUNCTIONS
