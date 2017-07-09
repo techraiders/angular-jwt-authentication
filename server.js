@@ -5,6 +5,7 @@ var express = require('express'),
   jwt = require('jsonwebtoken'),
   jwtSecret = 'jhskjdf5464mhsdh/6uk',
   app = express(),
+  expressJwt = require('express-jwt'),
 
   // sudo database having registered user details to match
   user = {
@@ -18,6 +19,15 @@ app.use(cors());
 // 
 app.use(bodyParser.json());
 
+// Intercepts all the request that comes in, takes the authorization header with the Bearer and the token, decode that token using jwtSecret, if it does decode properly, and the signature is verified, it adds user to the request object, and the user property will simply be the decoded JSON object.
+
+app.use(expressJwt({
+  secret: jwtSecret
+}).unless({
+  path: ['/login']
+}));
+
+// Responds fake random user object.
 app.get('/random-user', function(req, res) {
   var user = faker.helpers.userCard();
   user.avatar = faker.image.avatar();
@@ -38,19 +48,18 @@ app.post('/login', authenticate, function(req, res) {
 // UTIL FUNCTIONS
 function authenticate(req, res, next) {
   var body = req.body;
-
   if (!body.username || !body.password) {
     res.status(404).end('Must provide username or password');
   }
-
-  console.log('username: ' + body.username);
-  console.log('password: ' + body.password);
-
   if (body.username !== user.username || body.password !== user.password) {
     res.status(401).end('Incorrect username or password');
   }
   next();
 }
+
+app.get('/me', function(req, res) {
+  res.send(req.user);
+});
 
 app.listen(3000, function() {
   console.log('App listening on localhost:3000');
