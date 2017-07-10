@@ -15,6 +15,8 @@
     // initialization
     UserFactory.getUser().then(function(response) {
       vm.user = response.data;
+    }, function(reason) {
+      alert(reason.data);
     });
 
 
@@ -67,7 +69,9 @@
       if (AuthTokenFactory.getToken()) {
         return $http.get(API_URL + '/me');
       } else {
-        alert('client has no auth token');
+        return $q.reject({
+          data: 'client has no auth token'
+        });
       }
     }
 

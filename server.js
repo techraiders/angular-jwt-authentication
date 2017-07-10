@@ -19,13 +19,14 @@ app.use(cors());
 // 
 app.use(bodyParser.json());
 
-// Intercepts all the request that comes in, takes the authorization header with the Bearer and the token, decode that token using jwtSecret, if it does decode properly, and the signature is verified, it adds user to the request object, and the user property will simply be the decoded JSON object.
-
+// expressJwt under the cover intercepts all the request that comes in, takes the authorization header with the Bearer and the token, decode that token using jwtSecret, if it does decode properly, and the signature is verified, it adds user to the request object, and the user property will simply be the decoded JSON object.
 app.use(expressJwt({
   secret: jwtSecret
 }).unless({
   path: ['/login']
 }));
+// When the user is logging in, obviously he won't have the token, so we need to add unless on this middleware, and the path in this array.
+
 
 // Responds fake random user object.
 app.get('/random-user', function(req, res) {
@@ -37,11 +38,11 @@ app.get('/random-user', function(req, res) {
 // responds to post request made by cliet when path in url is /login
 app.post('/login', authenticate, function(req, res) {
   var token = jwt.sign({
-    username: user.username
+    username: user.username // constructs pyload, having username key, value pair.
   }, jwtSecret);
   res.send({
     token: token,
-    user: user
+    user: user // just for simplicity sake, it sends the user back to client to be recognized by the developer.
   });
 });
 
